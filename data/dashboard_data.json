@@ -1,0 +1,181 @@
+{
+  "monthly": [
+    {
+      "month": "Dec 2010",
+      "revenue": 823746.1399999646,
+      "orders": 1629
+    },
+    {
+      "month": "Jan 2011",
+      "revenue": 691364.5600000108,
+      "orders": 1120
+    },
+    {
+      "month": "Feb 2011",
+      "revenue": 523631.8900000278,
+      "orders": 1126
+    },
+    {
+      "month": "Mar 2011",
+      "revenue": 717639.3600000187,
+      "orders": 1531
+    },
+    {
+      "month": "Apr 2011",
+      "revenue": 537808.6210000243,
+      "orders": 1318
+    },
+    {
+      "month": "May 2011",
+      "revenue": 770536.0200000107,
+      "orders": 1731
+    },
+    {
+      "month": "Jun 2011",
+      "revenue": 761739.9000000219,
+      "orders": 1576
+    },
+    {
+      "month": "Jul 2011",
+      "revenue": 719221.1910000272,
+      "orders": 1540
+    },
+    {
+      "month": "Aug 2011",
+      "revenue": 748076.3200000171,
+      "orders": 1406
+    },
+    {
+      "month": "Sep 2011",
+      "revenue": 1058590.171999997,
+      "orders": 1896
+    },
+    {
+      "month": "Oct 2011",
+      "revenue": 1154979.2999999207,
+      "orders": 2129
+    },
+    {
+      "month": "Nov 2011",
+      "revenue": 1509496.329999743,
+      "orders": 2884
+    },
+    {
+      "month": "Dec 2011",
+      "revenue": 638792.680000013,
+      "orders": 839
+    }
+  ],
+  "segments": [
+    {
+      "segment": "Champions",
+      "num_customers": 1358,
+      "total_revenue": 8297979.560999242,
+      "avg_recency_days": 17.00515463917526,
+      "avg_frequency": 10.776877761413845,
+      "pct_of_customers": 31.3,
+      "pct_of_revenue": 77.9
+    },
+    {
+      "segment": "Loyal Customers",
+      "num_customers": 674,
+      "total_revenue": 854679.011,
+      "avg_recency_days": 61.0919881305638,
+      "avg_frequency": 3.943620178041543,
+      "pct_of_customers": 15.5,
+      "pct_of_revenue": 8.0
+    },
+    {
+      "segment": "Lost",
+      "num_customers": 946,
+      "total_revenue": 455041.621,
+      "avg_recency_days": 253.22832980972515,
+      "avg_frequency": 1.244186046511628,
+      "pct_of_customers": 21.8,
+      "pct_of_revenue": 4.3
+    },
+    {
+      "segment": "New / Promising",
+      "num_customers": 591,
+      "total_revenue": 440100.95,
+      "avg_recency_days": 26.338409475465312,
+      "avg_frequency": 1.377326565143824,
+      "pct_of_customers": 13.6,
+      "pct_of_revenue": 4.1
+    },
+    {
+      "segment": "Needs Attention",
+      "num_customers": 633,
+      "total_revenue": 355644.851,
+      "avg_recency_days": 85.11216429699842,
+      "avg_frequency": 1.3507109004739335,
+      "pct_of_customers": 14.6,
+      "pct_of_revenue": 3.3
+    },
+    {
+      "segment": "At Risk",
+      "num_customers": 138,
+      "total_revenue": 252176.49,
+      "avg_recency_days": 204.15217391304347,
+      "avg_frequency": 4.246376811594203,
+      "pct_of_customers": 3.2,
+      "pct_of_revenue": 2.4
+    }
+  ],
+  "quintile": [
+    {
+      "revenue_quintile": 1,
+      "pct_of_total_revenue": 78.8
+    },
+    {
+      "revenue_quintile": 2,
+      "pct_of_total_revenue": 11.5
+    },
+    {
+      "revenue_quintile": 3,
+      "pct_of_total_revenue": 5.6
+    },
+    {
+      "revenue_quintile": 4,
+      "pct_of_total_revenue": 2.9
+    },
+    {
+      "revenue_quintile": 5,
+      "pct_of_total_revenue": 1.2
+    }
+  ],
+  "country": [
+    {
+      "country": "EIRE",
+      "revenue": 2009760.4799990158
+    },
+    {
+      "country": "France",
+      "revenue": 1953238.6299990905
+    },
+    {
+      "country": "Switzerland",
+      "revenue": 1801437.4299991732
+    },
+    {
+      "country": "Portugal",
+      "revenue": 1777654.4699991802
+    },
+    {
+      "country": "Israel",
+      "revenue": 1751436.2699992242
+    },
+    {
+      "country": "Unspecified",
+      "revenue": 1746881.6499992372
+    },
+    {
+      "country": "Bahrain",
+      "revenue": 1744762.9799992426
+    },
+    {
+      "country": "Hong Kong",
+      "revenue": 1744214.5799992427
+    }
+  ]
+}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Customer Analytics — RFM Segmentation & Retention</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="assets/chart.umd.js"></script>
+<style>
+  :root{
+    --bg:#F7F8FA; --card:#FFFFFF; --ink:#1B2A33; --ink-soft:#5B6B73;
+    --primary:#2E5266; --secondary:#6E8898; --accent:#C08552; --line:#E2E5E8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif; line-height:1.5;
+  }
+  .wrap{max-width:1040px; margin:0 auto; padding:56px 24px 80px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--secondary); margin-bottom:10px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif; font-size:clamp(28px,4vw,40px);
+    font-weight:700; margin:0 0 10px; letter-spacing:-.01em;
+  }
+  .sub{color:var(--ink-soft); font-size:15px; max-width:640px; margin:0 0 40px;}
+  .hero{
+    display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:center;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:32px; margin-bottom:28px;
+  }
+  .hero-stat{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:clamp(48px,7vw,72px);
+    color:var(--accent); line-height:1; white-space:nowrap;
+  }
+  .hero-text h2{font-family:'Space Grotesk',sans-serif; font-size:20px; margin:0 0 8px;}
+  .hero-text p{color:var(--ink-soft); font-size:14.5px; margin:0;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:24px;
+  }
+  .card.full{grid-column:1/-1;}
+  .card h3{
+    font-family:'Space Grotesk',sans-serif; font-size:16px; margin:0 0 4px; font-weight:600;
+  }
+  .card .desc{color:var(--ink-soft); font-size:13px; margin:0 0 18px;}
+  .chart-box{position:relative; height:280px;}
+  .chart-box.tall{height:340px;}
+  footer{
+    margin-top:36px; padding-top:24px; border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; gap:10px 24px; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);
+  }
+  .chip{
+    border:1px solid var(--line); border-radius:100px; padding:5px 12px;
+    background:#fff;
+  }
+  @media (max-width:720px){
+    .hero{grid-template-columns:1fr;}
+    .grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Retail Customer Analytics — Portfolio Project</div>
+  <h1>Where a UK online retailer's revenue actually comes from</h1>
+  <p class="sub">RFM segmentation and cohort retention analysis on 531,282 real transactions
+  (Dec 2010 – Dec 2011, 4,340 customers, 38 countries). Built with SQL (DuckDB), Python, and this dashboard.</p>
+
+  <div class="hero">
+    <div class="hero-stat">77.9%</div>
+    <div class="hero-text">
+      <h2>of all revenue comes from just 31% of customers</h2>
+      <p>This "Champions" segment — 1,358 customers who buy often and recently — is confirmed two
+      independent ways: RFM segmentation and a simple revenue-quintile split (top 20% of customers
+      drive 78.8% of revenue). A win-back campaign for the 138 "At Risk" customers, who used to buy
+      this often but have gone quiet for 200+ days on average, is the clearest lever in this data.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card full">
+      <h3>Monthly Revenue</h3>
+      <p class="desc">Steady through the year, with a sharp seasonal build into Q4 — revenue nearly doubles from August to November.</p>
+      <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>Revenue by Customer Segment</h3>
+      <p class="desc">RFM segmentation (Recency, Frequency, Monetary)</p>
+      <div class="chart-box tall"><canvas id="segmentChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h3>Revenue Concentration</h3>
+      <p class="desc">Customers ranked into revenue quintiles</p>
+      <div class="chart-box tall"><canvas id="quintileChart"></canvas></div>
+    </div>
+
+    <div class="card full">
+      <h3>Top Markets Outside the UK</h3>
+      <p class="desc">The UK dominates volume (£9.05M), but these markets show where else demand exists.</p>
+      <div class="chart-box"><canvas id="countryChart"></canvas></div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="chip">SQL · DuckDB</span>
+    <span class="chip">Python · pandas</span>
+    <span class="chip">RFM Segmentation</span>
+    <span class="chip">Cohort Retention</span>
+    <span>Data: UCI Online Retail Dataset (CC BY 4.0)</span>
+  </footer>
+
+</div>
+
+<script>
+const DATA = {
+  "monthly": [
+    {
+      "month": "Dec 2010",
+      "revenue": 823746.1399999646,
+      "orders": 1629
+    },
+    {
+      "month": "Jan 2011",
+      "revenue": 691364.5600000108,
+      "orders": 1120
+    },
+    {
+      "month": "Feb 2011",
+      "revenue": 523631.8900000278,
+      "orders": 1126
+    },
+    {
+      "month": "Mar 2011",
+      "revenue": 717639.3600000187,
+      "orders": 1531
+    },
+    {
+      "month": "Apr 2011",
+      "revenue": 537808.6210000243,
+      "orders": 1318
+    },
+    {
+      "month": "May 2011",
+      "revenue": 770536.0200000107,
+      "orders": 1731
+    },
+    {
+      "month": "Jun 2011",
+      "revenue": 761739.9000000219,
+      "orders": 1576
+    },
+    {
+      "month": "Jul 2011",
+      "revenue": 719221.1910000272,
+      "orders": 1540
+    },
+    {
+      "month": "Aug 2011",
+      "revenue": 748076.3200000171,
+      "orders": 1406
+    },
+    {
+      "month": "Sep 2011",
+      "revenue": 1058590.171999997,
+      "orders": 1896
+    },
+    {
+      "month": "Oct 2011",
+      "revenue": 1154979.2999999207,
+      "orders": 2129
+    },
+    {
+      "month": "Nov 2011",
+      "revenue": 1509496.329999743,
+      "orders": 2884
+    },
+    {
+      "month": "Dec 2011",
+      "revenue": 638792.680000013,
+      "orders": 839
+    }
+  ],
+  "segments": [
+    {
+      "segment": "Champions",
+      "num_customers": 1358,
+      "total_revenue": 8297979.560999242,
+      "avg_recency_days": 17.00515463917526,
+      "avg_frequency": 10.776877761413845,
+      "pct_of_customers": 31.3,
+      "pct_of_revenue": 77.9
+    },
+    {
+      "segment": "Loyal Customers",
+      "num_customers": 674,
+      "total_revenue": 854679.011,
+      "avg_recency_days": 61.0919881305638,
+      "avg_frequency": 3.943620178041543,
+      "pct_of_customers": 15.5,
+      "pct_of_revenue": 8.0
+    },
+    {
+      "segment": "Lost",
+      "num_customers": 946,
+      "total_revenue": 455041.621,
+      "avg_recency_days": 253.22832980972515,
+      "avg_frequency": 1.244186046511628,
+      "pct_of_customers": 21.8,
+      "pct_of_revenue": 4.3
+    },
+    {
+      "segment": "New / Promising",
+      "num_customers": 591,
+      "total_revenue": 440100.95,
+      "avg_recency_days": 26.338409475465312,
+      "avg_frequency": 1.377326565143824,
+      "pct_of_customers": 13.6,
+      "pct_of_revenue": 4.1
+    },
+    {
+      "segment": "Needs Attention",
+      "num_customers": 633,
+      "total_revenue": 355644.851,
+      "avg_recency_days": 85.11216429699842,
+      "avg_frequency": 1.3507109004739335,
+      "pct_of_customers": 14.6,
+      "pct_of_revenue": 3.3
+    },
+    {
+      "segment": "At Risk",
+      "num_customers": 138,
+      "total_revenue": 252176.49,
+      "avg_recency_days": 204.15217391304347,
+      "avg_frequency": 4.246376811594203,
+      "pct_of_customers": 3.2,
+      "pct_of_revenue": 2.4
+    }
+  ],
+  "quintile": [
+    {
+      "revenue_quintile": 1,
+      "pct_of_total_revenue": 78.8
+    },
+    {
+      "revenue_quintile": 2,
+      "pct_of_total_revenue": 11.5
+    },
+    {
+      "revenue_quintile": 3,
+      "pct_of_total_revenue": 5.6
+    },
+    {
+      "revenue_quintile": 4,
+      "pct_of_total_revenue": 2.9
+    },
+    {
+      "revenue_quintile": 5,
+      "pct_of_total_revenue": 1.2
+    }
+  ],
+  "country": [
+    {
+      "country": "EIRE",
+      "revenue": 2009760.4799990158
+    },
+    {
+      "country": "France",
+      "revenue": 1953238.6299990905
+    },
+    {
+      "country": "Switzerland",
+      "revenue": 1801437.4299991732
+    },
+    {
+      "country": "Portugal",
+      "revenue": 1777654.4699991802
+    },
+    {
+      "country": "Israel",
+      "revenue": 1751436.2699992242
+    },
+    {
+      "country": "Unspecified",
+      "revenue": 1746881.6499992372
+    },
+    {
+      "country": "Bahrain",
+      "revenue": 1744762.9799992426
+    },
+    {
+      "country": "Hong Kong",
+      "revenue": 1744214.5799992427
+    }
+  ]
+};
+
+const primary = '#2E5266', secondary = '#6E8898', accent = '#C08552', line = '#E2E5E8';
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.color = '#5B6B73';
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.monthly.map(d => d.month),
+    datasets: [{
+      data: DATA.monthly.map(d => d.revenue),
+      borderColor: primary, backgroundColor: 'rgba(46,82,102,0.08)',
+      fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: primary, borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => '£' + Math.round(c.parsed.y).toLocaleString() } } },
+    scales: {
+      y: { grid: { color: line }, ticks: { callback: v => '£' + (v/1000) + 'K' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('segmentChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.segments.map(d => d.segment),
+    datasets: [{
+      data: DATA.segments.map(d => d.pct_of_revenue),
+      backgroundColor: DATA.segments.map(d => d.segment === 'Champions' ? accent : primary),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.parsed.x + '% of revenue' } } },
+    scales: {
+      x: { grid: { color: line }, ticks: { callback: v => v + '%' }, max: 90 },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('quintileChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Top 20%','21-40%','41-60%','61-80%','Bottom 20%'],
+    datasets: [{
+      data: DATA.quintile.map(d => d.pct_of_total_revenue),
+      backgroundColor: ['#C08552','#2E5266','#2E5266','#2E5266','#2E5266'],
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.parsed.y + '% of revenue' } } },
+    scales: {
+      y: { grid: { color: line }, ticks: { callback: v => v + '%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('countryChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.country.map(d => d.country),
+    datasets: [{
+      data: DATA.country.map(d => d.revenue),
+      backgroundColor: secondary, borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => '£' + Math.round(c.parsed.y).toLocaleString() } } },
+    scales: {
+      y: { grid: { color: line }, ticks: { callback: v => '£' + (v/1000).toFixed(0) + 'K' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>

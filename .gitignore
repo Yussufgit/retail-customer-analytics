@@ -1,0 +1,10 @@
+# Regenerable local database (rebuild with sql/01_schema_setup.sql)
+retail.duckdb
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
