@@ -1,6 +1,5 @@
 # Retail Customer Analytics: RFM Segmentation & Retention
 
-**Live dashboard:** open `index.html` in a browser, or see the preview below.
 **Business question:** Which customers actually drive this retailer's revenue, and where's the clearest opportunity to protect or grow it?
 
 ![Dashboard preview](visuals/00_dashboard_preview.png)
